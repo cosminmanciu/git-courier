@@ -46,7 +46,6 @@ class FANCourierValidator
 
         $totalVolume = $maxLength*$maxWidth*$maxHeight;
         if ($totalVolume > self::MAX_DELIVERY_VOLUME) {
-            throw new MaxProductLengthException();
             throw new ProductTotalVolumeNotSupported();
         }
     }
