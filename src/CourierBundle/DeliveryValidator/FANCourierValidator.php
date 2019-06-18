@@ -4,39 +4,42 @@ namespace CourierBundle\DeliveryValidator;
 
 use CommonBundle\Entity\Product\Product;
 use CourierBundle\DeliveryValidator\Exception\DeliveryNotSupported;
-use CourierBundle\DeliveryValidator\Exception\MaxProductLengthException;
-use CourierBundle\DeliveryValidator\Exception\MaxWeightException;
-use CourierBundle\DeliveryValidator\Exception\ProductTypeException;
-use CourierBundle\DeliveryValidator\Exception\ProductLengthNotSupported;
-use CourierBundle\DeliveryValidator\Exception\ProductTotalVolumeNotSupported;
 use DeliveryBundle\Entity\Delivery;
 
+/**
+ * Class FANCourierValidator
+ * @package CourierBundle\DeliveryValidator
+ */
 class FANCourierValidator
 {
     const MAX_WEIGHT = 40000;
     const MAX_PRODUCT_LENGTH = 2000;
     const MAX_DELIVERY_VOLUME = 1000000000;
 
+    /**
+     * @param Delivery $delivery
+     * @throws DeliveryNotSupported
+     */
     public function supportsDelivery(Delivery $delivery)
     {
         $maxLength = 0;
         $maxWidth = 0;
         $maxHeight = 0;
 
-        foreach ($delivery->products as $product) {
-            if ($product->type !== Product::DRY) {
-                throw new ProductTypeException();
+        foreach ($delivery->getProducts() as $product) {
+            if ($product->getType() !== Product::DRY) {
+                throw new DeliveryNotSupported();
             }
 
-            if ($product->weight > self::MAX_WEIGHT) {
-                throw new MaxWeightException();
+            if ($product->getWeight() > self::MAX_WEIGHT) {
+                throw new DeliveryNotSupported();
             }
 
-            $dimmensions = [$product->length, $product->width, $product->height];
-            rsort($dimmensions);
-            list($length, $width, $height) = $dimmensions;
+            $dimensions = [$product->getLength(), $product->getWeight(), $product->getHeight()];
+            rsort($dimensions);
+            list($length, $width, $height) = $dimensions;
             if ($length > self::MAX_PRODUCT_LENGTH) {
-                throw new ProductLengthNotSupported();
+                throw new DeliveryNotSupported();
             }
 
             $maxLength = max($maxLength, $length);
@@ -46,7 +49,7 @@ class FANCourierValidator
 
         $totalVolume = $maxLength*$maxWidth*$maxHeight;
         if ($totalVolume > self::MAX_DELIVERY_VOLUME) {
-            throw new ProductTotalVolumeNotSupported();
+            throw new DeliveryNotSupported();
         }
     }
 }
