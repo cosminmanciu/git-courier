@@ -4,6 +4,8 @@ namespace CourierBundle\DeliveryValidator;
 
 use CommonBundle\Entity\Product\Product;
 use CourierBundle\DeliveryValidator\Exception\DeliveryNotSupported;
+use CourierBundle\DeliveryValidator\Exception\ProductLengthNotSupported;
+use CourierBundle\DeliveryValidator\Exception\ProductTotalVolumeNotSupported;
 use DeliveryBundle\Entity\Delivery;
 
 class FANCourierValidator
@@ -31,7 +33,7 @@ class FANCourierValidator
             rsort($dimmensions);
             list($length, $width, $height) = $dimmensions;
             if ($length > self::MAX_PRODUCT_LENGTH) {
-                throw new DeliveryNotSupported();
+                throw new ProductLengthNotSupported();
             }
 
             $maxLength = max($maxLength, $length);
@@ -41,7 +43,7 @@ class FANCourierValidator
 
         $totalVolume = $maxLength*$maxWidth*$maxHeight;
         if ($totalVolume > self::MAX_DELIVERY_VOLUME) {
-            throw new DeliveryNotSupported();
+            throw new ProductTotalVolumeNotSupported();
         }
     }
 }
